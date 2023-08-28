@@ -19,7 +19,6 @@ function handlerFunction(stream) {
     }
   }
 }
-          
 
 record.onclick = e => {
   console.log('Record was clicked')
@@ -39,8 +38,6 @@ stopRecord.onclick = e => {
 sendRecording.onclick = e => {
   console.log("Upload recording was clicked")
   let formData = new FormData();
-  formData.append('file', blob);
-
+  formData.append('file', blob, "blob.ogg");
   fetch('./upload', {method:"POST", body: formData}).then(response => console.log(response))
-
 }

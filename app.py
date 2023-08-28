@@ -42,30 +42,23 @@ def index():
 def upload():
     if request.method == 'POST':
 
-        # RECEIVING AUDIO FILE
-        # ### testing
-        # print("="*20, "Testing starts")
-        # blob = request.files['data']
-        # print("="*20, "Testing stops")
-        # ### testing
-
+        # temporarily save file
         file = request.files['file']
-        name = file.filename + ".ogg"
-        file.save(name)
-        print(file.mimetype)
+        file.save(file.filename)
         
         # TRANSCRIPTION
-        print("Transcription started!")
-        with open(name, "rb") as voice_note:
-            print("File opened?")
+        print("Transcription started.")
+        with open(file.filename, "rb") as voice_note:
             transcript = openai.Audio.transcribe(api_key=OPENAI_API_KEY,
                                         model="whisper-1",
                                         file=voice_note,
                                         response_format="text",
                                         language="en"
                                         )
-
         print("Transcription succes!")
+
+        # remove temporary file
+        os.remove(file.filename)
 
         # SUMMARIZATION
         summary_prompt      = """\
@@ -76,12 +69,14 @@ Secondly, summarize in first person the content of this text in one coherent sto
 Thirdly, list the different topics discussed in this text. Only add a topic when it is discussed for at least a couple of sentences. \
 Fourth, imagine being a critical life coach of the person writing this text. What are the three best questions you could ask regarding this text?\
 """
+        print("Text processing started.")
         text_response = openai.ChatCompletion.create(api_key=OPENAI_API_KEY,
                                                     model="gpt-3.5-turbo",
                                                     messages=[
                                                         {"role": "system", "content": summary_prompt},
                                                         {"role": "user", "content": transcript}
                                              ])
+        print("Text processing succes!")
 
         # NOTION
         content_notion = text_response["choices"][0]["message"]["content"].split("\n\n")
@@ -160,6 +155,7 @@ Fourth, imagine being a critical life coach of the person writing this text. Wha
                         }
 
         response_get = requests.post(url, headers=headers, json=data_database)
+        print("Processed text uploading succesful!")
 
         return render_template("summarization.html", title_notion=title_notion, summary_notion=summary_notion, topics_notion=topics_notion, critical_questions_notion=critical_questions_notion)
 

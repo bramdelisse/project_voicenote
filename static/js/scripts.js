@@ -4,15 +4,16 @@
 navigator.mediaDevices.getUserMedia({audio:true})
 .then(stream => {handlerFunction(stream)})
 
+let blob;
 
 function handlerFunction(stream) {
   rec = new MediaRecorder(stream);
   rec.ondataavailable = e => {
     audioChunks.push(e.data);
     if (rec.state == "inactive"){
-      let blob = new Blob(audioChunks,{type:'audio/mpeg-3'});
+      blob = new Blob(audioChunks, { type: "audio/ogg; codecs=opus" });
       recordedAudio.src = URL.createObjectURL(blob);
-      alert(`object url created locally ${recordedAudio.src}`)
+      console.log(`object url created locally ${recordedAudio.src}`)
       recordedAudio.controls=true;
       recordedAudio.autoplay=true;
     }
@@ -38,43 +39,8 @@ stopRecord.onclick = e => {
 sendRecording.onclick = e => {
   console.log("Upload recording was clicked")
   let formData = new FormData();
-  formData.append('data', blob);
-  console.log('blob', blob)
-  console.log(formData)
-  
-  // var xhr = new XMLHttpRequest();
-  // xhr.open('POST', '/upload', true);
-  // xhr.send(blob);
-  // console.log("function sendData triggered")
+  formData.append('file', blob);
 
-  $.ajax({
-    type: 'POST',
-    url: '/upload',
-    data: formData,
-    contentType: false,
-    processData: false,
-    success: function(result) {
-      console.log('success', result);
-
-      $("#chatbox").append(`<p class ="userText"><audio style="background-color:white;" controls> <source src="${Url}" type="audio/wav"></audio></p>`);
-      $("#chatbox").append(`<p class ="botText"><span>${result.emotion}</span></p>`);
-      $("#textInput").val("")
-    },
-    error: function(result) {
-      alert('sorry an error occured');
-    }
-  }).done(function(data) {
-    console.log(data);
-  });
-
-  // fetch('./upload', {method:"POST", body: blob}).then(response => console.log(response.text()))
+  fetch('./upload', {method:"POST", body: formData}).then(response => console.log(response))
 
 }
-
-  // function sendData() {
-  //   blob = recordedAudio.src
-  //   var xhr = new XMLHttpRequest();
-  //   xhr.open('POST', '/upload', true);
-  //   xhr.send(blob);
-  //   console.log("function sendData triggered")
-  //   }

@@ -50,17 +50,22 @@ def upload():
         # ### testing
 
         file = request.files['file']
-        name = file.filename
+        name = file.filename + ".ogg"
         file.save(name)
+        print(file.mimetype)
         
         # TRANSCRIPTION
-        voice_note = open(name, "rb")
-        transcript = openai.Audio.transcribe(api_key=OPENAI_API_KEY,
-                                     model="whisper-1",
-                                     file=voice_note,
-                                     response_format="text",
-                                     language="en"
-                                     )
+        print("Transcription started!")
+        with open(name, "rb") as voice_note:
+            print("File opened?")
+            transcript = openai.Audio.transcribe(api_key=OPENAI_API_KEY,
+                                        model="whisper-1",
+                                        file=voice_note,
+                                        response_format="text",
+                                        language="en"
+                                        )
+
+        print("Transcription succes!")
 
         # SUMMARIZATION
         summary_prompt      = """\

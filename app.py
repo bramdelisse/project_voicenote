@@ -1,6 +1,4 @@
-from distutils.log import debug
-from fileinput import filename
-from flask import Flask, render_template, request, flash, redirect
+from flask import Flask, render_template, request
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -8,15 +6,18 @@ import openai
 import os
 import requests
 
+from scripts import transcribe
+
 from dotenv import load_dotenv
 load_dotenv()
 
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 NOTION_API_KEY = os.environ["NOTION_API_KEY"]
 NOTION_DATABASE_ID = os.environ["NOTION_DATABASE_ID"]
+# PASSWORD = os.environ["PASSWORD"]
 
 UPLOAD_FOLDER = '/temp/'
-ALLOWED_EXTENSIONS = {'mp3'}
+# ALLOWED_EXTENSIONS = {'mp3'}
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -24,7 +25,7 @@ app.config['MAX_CONTENT_LENGTH'] = 2 * 1000 * 1000
 auth = HTTPBasicAuth()
 
 users = {
-    "bram": generate_password_hash("pwampwam")
+    "bram": generate_password_hash('pwampwam')
 }
 
 @auth.verify_password
@@ -42,19 +43,14 @@ def index():
 def upload():
     if request.method == 'POST':
 
-        # temporarily save file
+        # save temporary file
         file = request.files['file']
         file.save(file.filename)
         
         # TRANSCRIPTION
         print("Transcription started.")
-        with open(file.filename, "rb") as voice_note:
-            transcript = openai.Audio.transcribe(api_key=OPENAI_API_KEY,
-                                        model="whisper-1",
-                                        file=voice_note,
-                                        response_format="text",
-                                        language="en"
-                                        )
+        with open(file.filename, "rb") as audio_file:
+            transcript = transcribe(audio_file=audio_file)
         print("Transcription succes!")
 
         # remove temporary file
@@ -63,7 +59,7 @@ def upload():
         # SUMMARIZATION
         summary_prompt      = """\
 You are a helpful assistant, specialized in summarizing and understanding the core of a given message. \
-For the given piece of text, you are going to perform the following four tasks. \
+For the given piece of text, perform the following four tasks. \
 Firstly, start your response with a consice title describing the text. \
 Secondly, summarize in first person the content of this text in one coherent story of about one alinea written. \
 Thirdly, list the different topics discussed in this text. Only add a topic when it is discussed for at least a couple of sentences. \

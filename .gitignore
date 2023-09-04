@@ -1,7 +1,14 @@
 # Local files
 voicenotes
 journal.txt
+
+ffmpeg.exe
+ffplay.exe
+ffprobe.exe
+
 function_calling.ipynb
+testing_notebook.ipynb
+
 
 ### TEMPLATE
 # Byte-compiled / optimized / DLL files

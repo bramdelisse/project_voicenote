@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice-to-Text</title>
+    <link rel="stylesheet" href="./static/css/styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Thought Processor 8000</h1>
+    <hr>
+    <h2>Upload your MP3 file</h2>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".mp3">
+        <input type="submit" value="Upload">
+    </form>
+    <h2>Record</h2>
+    <p>
+        <button id=record>Record</button>
+        <button id=stopRecord disabled>Stop</button>
+    </p>
+    <p>
+        <audio id=recordedAudio></audio>
+    </p>
+    <p>
+        <button id=sendRecording action="/upload">Send Recording</button>
+    </p>
+    <script src="./static/js/scripts.js"></script>
+</body>
+</html>

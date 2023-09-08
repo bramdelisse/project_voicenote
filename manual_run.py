@@ -6,7 +6,7 @@ import os
 import requests
 
 # import scripts
-from scripts import create_chunks, transcribe, whisper_call
+from scripts import create_chunks, transcribe, whisper_call, create_data_database
 from prompts import prompts
 
 # declaring secrets
@@ -38,23 +38,25 @@ print("Transcription finished!")
 # TRANSCRIPT PROCESSING
 print("Text processing started.")
 token_estimate = len(transcript) / 4 # average token length
-if token_estimate > MAX_CONTEXT_16K - 100: # for safety
-    # cut transcript
-    # run multiple transcripts
-    pass
-elif MAX_CONTEXT_16K > token_estimate > MAX_CONTEXT_4K - 100:
-    MODEL = "gpt-3.5-turbo-16k"
-    # run transcript
-elif MAX_CONTEXT_4K > token_estimate:
+if MAX_CONTEXT_4K > token_estimate:
     MODEL = "gpt-3.5-turbo"
-    # run transcript
-
-text_response = openai.ChatCompletion.create(api_key=OPENAI_API_KEY,
-                                            model=MODEL,
-                                            messages=[
+    text_response = openai.ChatCompletion.create(api_key=OPENAI_API_KEY, model=MODEL, messages=[
                                                 {"role": "system", "content": PROMPT},
                                                 {"role": "user", "content": transcript}
                                         ])
+elif MAX_CONTEXT_16K > token_estimate > MAX_CONTEXT_4K - 100:
+    MODEL = "gpt-3.5-turbo-16k"
+    text_response = openai.ChatCompletion.create(api_key=OPENAI_API_KEY, model=MODEL, messages=[
+                                                {"role": "system", "content": PROMPT},
+                                                {"role": "user", "content": transcript}
+                                        ])
+elif token_estimate > MAX_CONTEXT_16K - 100: # for safety
+    # cut transcript
+    # run multiple transcripts
+    pass
+else:
+    print("DEBUG: unexpected error. Token_estimate is not captured.")
+
 print("Text processing succes!")
 
 # PREPARE RESPONSE FOR NOTION
@@ -84,6 +86,7 @@ except:
 
 
 # NOTION UPLOAD
+MAX_BLOCK_SIZE = 2000
 url = "https://api.notion.com/v1/pages/"
 
 headers =   {
@@ -92,48 +95,9 @@ headers =   {
     "Content-Type": "application/json"
             }
 
-data_database = {
-
-    "parent":   {
-        "type": "database_id",
-        "database_id": NOTION_DATABASE_ID
-                },
-    "icon": {"emoji": "🎙️"},
-
-    "properties":   {
-        "Name":         {
-            "title": [{"text": {"content": title_notion}}]
-                        }  
-                    },
-
-    "children": [
-        {
-            "object": "block",
-            "heading_2": {"rich_text": [{"text": {"content": "Summary"}}]}
-        },
-        {
-            "object": "block",
-            "paragraph": {"rich_text": [{"text": {"content": summary_notion}}], "color": "default"}
-        },
-        {
-            "object": "block",
-            "heading_2": {"rich_text": [{"text": {"content": "Topics"}}]}
-        },
-        {
-            "object": "block",
-            "paragraph": {"rich_text": [{"text": {"content": topics_notion}}], "color": "default"}
-        },
-        {
-            "object": "block",
-            "heading_2": {"rich_text": [{"text": {"content": "Critical Questions"}}]}
-        },
-        {
-            "object": "block",
-            "paragraph": {"rich_text": [{"text": {"content": critical_questions_notion}}], "color": "default"}
-        }
-                ]
-
-                }
+data_database = create_data_database(NOTION_DATABASE_ID, MAX_BLOCK_SIZE,
+                                     title_notion, summary_notion, topics_notion, critical_questions_notion,
+                                     transcript)
 
 response_get = requests.post(url, headers=headers, json=data_database)
 print("Processed text uploading succesful!")

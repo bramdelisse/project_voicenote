@@ -1,6 +1,7 @@
 # Local files
 voicenotes
 journal.txt
+.vscode
 
 ffmpeg.exe
 ffplay.exe

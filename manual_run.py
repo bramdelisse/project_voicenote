@@ -6,7 +6,7 @@ import os
 import requests
 
 # import scripts
-from scripts import create_chunks, transcribe, whisper_call, create_data_database
+from scripts import transcribe, process_transcript, create_data_NOTION
 from prompts import prompts
 
 # declaring secrets
@@ -21,42 +21,24 @@ NOTION_DATABASE_ID = os.environ["NOTION_DATABASE_ID"]
 ########## DECLARING VARIABLES ################################################
 
 AUDIO_FILE_PATH = "./voicenotes/230831-reflection_daily.mp3"
-PROMPT = prompts['summary_prompt']
+TASK = "daily_reflection"
 
 MAX_WHISPER_AUDIO_SIZE = 26262828
 MAX_CONTEXT_4K = 4097
 MAX_CONTEXT_16K = 4097 * 4
 
 
-########## AUDIO PROCESSING ###################################################
+########## THOUGHT PROCESSING #################################################
 
-# TRANSCRIPTION
+####### TRANSCRIPTION #######
 print("Transcription started.")
-transcript = transcribe(AUDIO_FILE_PATH) # also deals with long audio files
+transcript = transcribe(TASK, AUDIO_FILE_PATH) # also deals with long audio files
 print("Transcription finished!")
 
-# TRANSCRIPT PROCESSING
-print("Text processing started.")
-token_estimate = len(transcript) / 4 # average token length
-if MAX_CONTEXT_4K > token_estimate:
-    MODEL = "gpt-3.5-turbo"
-    text_response = openai.ChatCompletion.create(api_key=OPENAI_API_KEY, model=MODEL, messages=[
-                                                {"role": "system", "content": PROMPT},
-                                                {"role": "user", "content": transcript}
-                                        ])
-elif MAX_CONTEXT_16K > token_estimate > MAX_CONTEXT_4K - 100:
-    MODEL = "gpt-3.5-turbo-16k"
-    text_response = openai.ChatCompletion.create(api_key=OPENAI_API_KEY, model=MODEL, messages=[
-                                                {"role": "system", "content": PROMPT},
-                                                {"role": "user", "content": transcript}
-                                        ])
-elif token_estimate > MAX_CONTEXT_16K - 100: # for safety
-    # cut transcript
-    # run multiple transcripts
-    pass
-else:
-    print("DEBUG: unexpected error. Token_estimate is not captured.")
 
+### TRANSCRIPT PROCESSING ###
+print("Text processing started.")
+text_response = process_transcript(TASK, transcript)
 print("Text processing succes!")
 
 # PREPARE RESPONSE FOR NOTION
@@ -95,7 +77,7 @@ headers =   {
     "Content-Type": "application/json"
             }
 
-data_database = create_data_database(NOTION_DATABASE_ID, MAX_BLOCK_SIZE,
+data_database = create_data_NOTION(NOTION_DATABASE_ID, MAX_BLOCK_SIZE, # deals with transcripts longer then Notion max block size
                                      title_notion, summary_notion, topics_notion, critical_questions_notion,
                                      transcript)
 

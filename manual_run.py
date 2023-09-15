@@ -6,7 +6,7 @@ import os
 import requests
 
 # import scripts
-from scripts import transcribe, process_transcript, create_data_NOTION
+from scripts import transcribe, process_transcript, prepare_data_NOTION, create_data_NOTION
 from prompts import prompts
 
 # declaring secrets
@@ -41,31 +41,15 @@ print("Text processing started.")
 text_response = process_transcript(TASK, transcript)
 print("Text processing succes!")
 
+
+########## NOTION ###########
 # PREPARE RESPONSE FOR NOTION
-content_notion = text_response["choices"][0]["message"]["content"].split("\n\n")
+content_notion = prepare_data_NOTION(TASK, text_response)
 
-title_notion = "Not found"
-summary_notion = "Not found"
-topics_notion = "Not found"
-critical_questions_notion = "Not found"
-
-try:
-    title_notion = content_notion[0]
-except:
-    pass
-try:
-    summary_notion = content_notion[1]
-except:
-    pass
-try:
-    topics_notion = content_notion[2]
-except:
-    pass
-try:
-    critical_questions_notion = content_notion[3]
-except:
-    pass
-
+title_notion = content_notion['title_notion']
+summary_notion = content_notion['summary_notion']
+topics_notion = content_notion['topics_notion']
+critical_questions_notion = content_notion['critical_questions_notion']
 
 # NOTION UPLOAD
 MAX_BLOCK_SIZE = 2000
@@ -77,7 +61,7 @@ headers =   {
     "Content-Type": "application/json"
             }
 
-data_database = create_data_NOTION(NOTION_DATABASE_ID, MAX_BLOCK_SIZE, # deals with transcripts longer then Notion max block size
+data_database = create_data_NOTION(TASK, NOTION_DATABASE_ID, MAX_BLOCK_SIZE, # deals with transcripts longer then Notion max block size
                                      title_notion, summary_notion, topics_notion, critical_questions_notion,
                                      transcript)
 

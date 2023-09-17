@@ -1,15 +1,12 @@
 # Local files
-voicenotes
+to_process
+testing
 journal.txt
 .vscode
 
 ffmpeg.exe
 ffplay.exe
 ffprobe.exe
-
-function_calling.ipynb
-test_notebook.ipynb
-testing_notebook.ipynb
 
 
 ### TEMPLATE

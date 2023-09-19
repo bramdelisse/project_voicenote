@@ -6,7 +6,8 @@ import openai
 import os
 import requests
 
-from scripts import transcribe
+from scripts import transcribe, process_transcript, check_response, prepare_yield_NOTION
+from prompts import prompts
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -15,6 +16,13 @@ OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 NOTION_API_KEY = os.environ["NOTION_API_KEY"]
 NOTION_DATABASE_ID = os.environ["NOTION_DATABASE_ID"]
 # PASSWORD = os.environ["PASSWORD"]
+
+# declaring static variables
+MAX_WHISPER_AUDIO_SIZE = 26262828
+MAX_CONTEXT_4K = 4097
+MAX_CONTEXT_16K = 4097 * 4
+MAX_BLOCK_SIZE = 2000
+THOUGHT = 'daily_reflection' # <- TODO as dropdown
 
 UPLOAD_FOLDER = '/temp/'
 # ALLOWED_EXTENSIONS = {'mp3'}
@@ -50,55 +58,23 @@ def upload():
         # TRANSCRIPTION
         print("Transcription started.")
         with open(file.filename, "rb") as audio_file:
-            transcript = transcribe(audio_file=audio_file)
+            transcript = transcribe(THOUGHT, audio_file) # also deals with long audio files
         print("Transcription succes!")
 
         # remove temporary file
         os.remove(file.filename)
 
-        # SUMMARIZATION
-        summary_prompt      = """\
-You are a helpful assistant, specialized in summarizing and understanding the core of a given message. \
-For the given piece of text, perform the following four tasks. \
-Firstly, start your response with a consice title describing the text. \
-Secondly, summarize in first person the content of this text in one coherent story of about one alinea written. \
-Thirdly, list the different topics discussed in this text. Only add a topic when it is discussed for at least a couple of sentences. \
-Fourth, imagine being a critical life coach of the person writing this text. What are the three best questions you could ask regarding this text?\
-"""
+        ### TRANSCRIPT PROCESSING ###
         print("Text processing started.")
-        text_response = openai.ChatCompletion.create(api_key=OPENAI_API_KEY,
-                                                    model="gpt-3.5-turbo",
-                                                    messages=[
-                                                        {"role": "system", "content": summary_prompt},
-                                                        {"role": "user", "content": transcript}
-                                             ])
+        text_response = process_transcript(THOUGHT, transcript)
         print("Text processing succes!")
 
-        # NOTION
-        content_notion = text_response["choices"][0]["message"]["content"].split("\n\n")
 
-        title_notion = "Not found"
-        summary_notion = "Not found"
-        topics_notion = "Not found"
-        critical_questions_notion = "Not found"
+        ########## NOTION ###########
+        # PREPARE RESPONSE FOR NOTION
+        content_notion = check_response(text_response)
 
-        try:
-            title_notion = content_notion[0]
-        except:
-            pass
-        try:
-            summary_notion = content_notion[1]
-        except:
-            pass
-        try:
-            topics_notion = content_notion[2]
-        except:
-            pass
-        try:
-            critical_questions_notion = content_notion[3]
-        except:
-            pass
-
+        # NOTION UPLOAD
         url = "https://api.notion.com/v1/pages/"
 
         headers =   {
@@ -107,54 +83,14 @@ Fourth, imagine being a critical life coach of the person writing this text. Wha
             "Content-Type": "application/json"
                     }
 
-        data_database = {
-        
-            "parent":   {
-                "type": "database_id",
-                "database_id": NOTION_DATABASE_ID
-                        },
-            "icon": {"emoji": "🎙️"},
-
-            "properties":   {
-                "Name":         {
-                    "title": [{"text": {"content": title_notion}}]
-                                }  
-                            },
-
-            "children": [
-                {
-                    "object": "block",
-                    "heading_2": {"rich_text": [{"text": {"content": "Summary"}}]}
-                },
-                {
-                    "object": "block",
-                    "paragraph": {"rich_text": [{"text": {"content": summary_notion}}], "color": "default"}
-                },
-                {
-                    "object": "block",
-                    "heading_2": {"rich_text": [{"text": {"content": "Topics"}}]}
-                },
-                {
-                    "object": "block",
-                    "paragraph": {"rich_text": [{"text": {"content": topics_notion}}], "color": "default"}
-                },
-                {
-                    "object": "block",
-                    "heading_2": {"rich_text": [{"text": {"content": "Critical Questions"}}]}
-                },
-                {
-                    "object": "block",
-                    "paragraph": {"rich_text": [{"text": {"content": critical_questions_notion}}], "color": "default"}
-                }
-                        ]
-
-                        }
+        data_database = prepare_yield_NOTION(THOUGHT, NOTION_DATABASE_ID, MAX_BLOCK_SIZE,
+                                            content_notion, transcript)
 
         response_get = requests.post(url, headers=headers, json=data_database)
         print("Processed text uploading succesful!")
 
-        return render_template("summarization.html", title_notion=title_notion, summary_notion=summary_notion, topics_notion=topics_notion, critical_questions_notion=critical_questions_notion)
+        return render_template("summarization.html", title_notion='todo', summary_notion='todo', topics_notion='todo', critical_questions_notion='todo')
 
 
 if __name__ == '__main__':  
-    app.run(debug=True)
+    app.run(debug=True,)

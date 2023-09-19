@@ -1,3 +1,5 @@
 openai
 flask
 flask_httpauth
+python-dotenv
+pydub

@@ -11,7 +11,7 @@ function handlerFunction(stream) {
   rec.ondataavailable = e => {
     audioChunks.push(e.data);
     if (rec.state == "inactive"){
-      blob = new Blob(audioChunks, { type: "audio/ogg; codecs=opus" });
+      blob = new Blob(audioChunks, { type: "audio/mp3; codecs=opus" });
       recordedAudio.src = URL.createObjectURL(blob);
       console.log(`object url created locally ${recordedAudio.src}`)
       recordedAudio.controls=true;
@@ -38,6 +38,6 @@ stopRecord.onclick = e => {
 sendRecording.onclick = e => {
   console.log("Upload recording was clicked")
   let formData = new FormData();
-  formData.append('file', blob, "blob.ogg");
+  formData.append('file', blob, "blob.mp3");
   fetch('./upload', {method:"POST", body: formData}).then(response => console.log(response))
 }

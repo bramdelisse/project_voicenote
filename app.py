@@ -42,7 +42,7 @@ def verify_password(username, password):
             check_password_hash(users.get(username), password):
         return username
 
-@app.route('/')
+@app.route('/thinktank')
 @auth.login_required
 def index():
     return render_template("index.html")
@@ -95,4 +95,4 @@ def upload():
 if __name__ == '__main__':  
     app.run(debug=True,
             host="192.168.2.15",
-            port=42069)
+            port=5000)

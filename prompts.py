@@ -76,7 +76,8 @@ Imagine being a blog post writer. You are smart, kind, and humble. You write fac
 },
 
 'nederlands': {
-    'whisper_prompt': """Hier volgt een Nederlands gesprek, dat in het Nederlands getranscribeerd moet worden. Een van de deelnemers heet Bram.""",
+    'whisper_prompt': """Hier volgt een Nederlands gesprek, dat in het Nederlands getranscribeerd moet worden.
+Een van de deelnemers heet Bram. Some wordt er Engels gesproken, dit mag in het Engels getranscribeerd worden. Echter, zodra er weer Nederlands gesproken wordt, moet er weer in het Nederlands getranscribeerd worden.""",
     'gpt_prompt': """
 ### Introductie
 Je bent een behulpvolle assistent, gespecialiseerd in het samenvatten van tekst.

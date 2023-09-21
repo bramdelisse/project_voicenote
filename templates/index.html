@@ -4,14 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voice-to-Text</title>
-    <link rel="stylesheet" href="./static/css/styles.css">
+    <!-- <link rel="stylesheet" href="./static/css/styles.css"> -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        label, select {
+          display: block;
+          margin-bottom: 10px; /* Adjust as needed */
+        }
+        input[type="file"], input[type="submit"] {
+          display: block;
+          margin-bottom: 30px; /* Adjust as needed */
+        }
+      </style>
 </head>
 <body>
-    <h1>ThinkTank</h1>
+    <h1>🎣 ThinkTank</h1>
     <hr>
     <!-- UPLOAD THOUGHT -->
-    <h2>Upload your thought</h2>
+    <h2>Upload your thought.</h2>
     <form action="/upload" method="post" enctype="multipart/form-data">
         <!-- File upload input -->
         <label for="fileInput">Thought upload (mp3)</label>

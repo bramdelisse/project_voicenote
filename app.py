@@ -17,7 +17,7 @@ NOTION_API_KEY = os.environ["NOTION_API_KEY"]
 NOTION_DATABASE_ID = os.environ["NOTION_DATABASE_ID"]
 # PASSWORD = os.environ["PASSWORD"]
 
-IP_ADDRESS = "0.0.0.0" #"192.168.2.15" #192.168.2.15 / ipconfig
+IP_ADDRESS = "192.168.2.15" #0.0.0.0 #192.168.2.15 / ipconfig
 
 # declaring static variables
 MAX_WHISPER_AUDIO_SIZE = 26262828

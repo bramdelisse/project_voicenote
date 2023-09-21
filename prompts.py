@@ -22,7 +22,7 @@ You are a helpful assistant, specialized in summarizing and understanding the co
 
 ### Output
 ```json
-{"title": "[output task 1]", "summary": "[output task 2]", "lessons": "["[output task 3]"]", "topics": ["[output task 4]"], "critical questions": ["[output task 5]"]}
+{"title": "[output task 1]", "summary": "[output task 2]", "lessons": ["[output task 3]"], "topics": ["[output task 4]"], "critical questions": ["[output task 5]"]}
 ```
 """
 },
@@ -36,18 +36,21 @@ In the following piece of text various different thoughts are stated.
 
 ### Tasks
 1. Create a title.
-2. Summarize the content of the text.
-3. Extract potential lessons learned by the writer.
-4. List the topics discussed in the text. Only add a topic when it is discussed in multiple sentences.
-5. Imagine being a critical life coach of the person writing this text. Provide the three best questions you could ask regarding the text.
+2. Seperate the thoughts in seperate pieces of text.
+3. List thinkers who had similar thoughts including the similar thoughts they had.
+4. Suggest potential further reading for expanding upon the thought.
+5. Give a compliment. Why is it a great thought to have?
+6. Be critical. What are mistakes or incompletenesses in the thought?
+7. Provide things for which this thought could be useful.
 
 ### Rules
-- Always perform all five tasks.
+- Always perform all seven tasks.
 - Provide your output in JSON format.
 
 ### Output
 ```json
-{"title": "[output task 1]", "summary": "[output task 2]", "lessons": "["[output task 3]"]", "topics": ["[output task 4]"], "critical questions": ["[output task 5]"]}
+{"title": "[output task 1]", "thoughts": ["[output task 2]"] , "thinkers": ["[output task 3]"],
+"further reading": ["[output task 4]"], "compliment": "[output task 5]"], "critique": "[output task 6]", "usufulness": ["[output task 7]"]}
 ```
 """
 },
@@ -93,7 +96,7 @@ Je bent een behulpvolle assistent, gespecialiseerd in het samenvatten van tekst.
 
 ### Output
 ```json
-{"title": "[output taak 1]", "samenvatting": "[output taak 2]", "onderwerpen": "["[output taak 3]"]"}
+{"title": "[output taak 1]", "samenvatting": "[output taak 2]", "onderwerpen": ["[output taak 3]"]}
 ```
 """
 }

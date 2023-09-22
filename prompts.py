@@ -78,25 +78,51 @@ Imagine being a blog post writer. You are smart, kind, and humble. You write fac
 """
 },
 
-'nederlands': {
-    'whisper_prompt': """Hier volgt een Nederlands gesprek, dat in het Nederlands getranscribeerd moet worden.
-Een van de deelnemers heet Bram. Some wordt er Engels gesproken, dit mag in het Engels getranscribeerd worden. Echter, zodra er weer Nederlands gesproken wordt, moet er weer in het Nederlands getranscribeerd worden.""",
+'interview_nederlands': {
+    'whisper_prompt': """Hier volgt een Nederlands interview, dat in het Nederlands getranscribeerd moet worden.
+Een van de deelnemers heet Bram. Some wordt er Engels gesproken, dit mag in het Engels getranscribeerd worden. Echter, zodra er weer Nederlands gesproken wordt, moet je weer in het Nederlands transcriberen.""",
     'gpt_prompt': """
 ### Introductie
-Je bent een behulpvolle assistent, gespecialiseerd in het samenvatten van tekst.
+Je bent een behulpvolle assistent, gespecialiseerd in het samenvatten van tekst. De tekst die volgt is een transcriptie van aan interview over AI. Maak gebruik van de transcriptie bij het uitvoeren van de volgende taken.
 
 ### Taken
 1. Maak een titel.
 2. Vat de inhoud van de tekst samen.
-3. Som de onderwerpen op die besproken worden in de tekst. Voeg een onderwerp pas toe als het voor minstens meerdere zinnen besproken wordt.
+3. Specificeer de mening van de geinterviewde over AI.
+4. Som de ideeen op die de geinterviewde geeft over AI.
+5. Som de onderwerpen op die besproken worden in de tekst. Voeg een onderwerp pas toe als het voor minstens meerdere zinnen besproken wordt.
 
 ### Regels
-- Voer altijd alle drie de taken uit.
+- Voer altijd alle vijf de taken uit.
 - Geef de output in een JSON format.
 
 ### Output
 ```json
-{"title": "[output taak 1]", "samenvatting": "[output taak 2]", "onderwerpen": ["[output taak 3]"]}
+{"title": "[output taak 1]", "samenvatting": "[output taak 2]", "mening over AI": "[output taak 3]", "ideeen": ["[output taak 4]"], "onderwerpen": ["[output taak 5]"]}
+```
+"""
+},
+
+'interview_english': {
+    'whisper_prompt': """Here follows an interview about AI. The conversation takes place between two people.""",
+    'gpt_prompt': """
+### Introduction
+You are a helpful assistant, specialized in summarizing and understanding the core of a given message. The text that follows is the transcription of an interview about AI. Using this transcription, execute the following tasks.
+
+### Tasks
+1. Create a title for the conversation.
+2. Summarize the conversation.
+3. State the opinion about AI of the interviewee.
+4. List all the ideas the interviewee provided
+5. List the topics discussed in the text. Only add a topic when it is discussed in multiple sentences.
+
+### Rules
+- Always perform all five tasks.
+- Provide your output in JSON format.
+
+### Output
+```json
+{"title": "[output task 1]", "summary": "[output task 2]", "opinion on AI": "[output task 3]", "ideas": ["[output task 4]"], "topics": ["[output task 5]"]}
 ```
 """
 }

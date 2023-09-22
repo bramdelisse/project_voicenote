@@ -28,8 +28,8 @@ MAX_CONTEXT_16K = 4097 * 4
 MAX_BLOCK_SIZE = 2000
 
 # declaring dynamic variables
-AUDIO_FILE_PATH = "./to_process/230901-geluidsopname_gesprek_youri.mp3"
-THOUGHT = "nederlands" # "daily_reflection", "blog", "nederlands"
+AUDIO_FILE_PATH = "./to_process/230922-AI_interview-Don.mp3"
+THOUGHT = "interview_english" # "daily_reflection", "shower", "blog", "interview_nederlands", "interview_english"
 
 
 ########## THOUGHT PROCESSING #################################################

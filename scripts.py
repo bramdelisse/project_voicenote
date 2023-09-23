@@ -161,6 +161,12 @@ def prepare_yield_NOTION(TASK, NOTION_DATABASE_ID, MAX_BLOCK_SIZE,
                         },
         "Thought":      {
             "select": {"name": TASK}
+                        },
+        "Archive":      {
+            "checkbox": False
+                        },
+        "Public":       {
+            "checkbox": False
                         }
         },
     "children": []
@@ -169,6 +175,8 @@ def prepare_yield_NOTION(TASK, NOTION_DATABASE_ID, MAX_BLOCK_SIZE,
     
     # Add TASK content
     for key in content_notion:
+        if key == "title":
+            continue
         data_database["children"].append({
             "object": "block",
             "heading_2": {"rich_text": [{"text": {"content": key}}]}

@@ -1,4 +1,4 @@
-# project_voicenote
-my first web app for saving my thoughts
+# ThinkTank
+Capture thoughts with minimal effort through voice.
 
-Currently just a hobby project
+My first web app. Currently just a hobby project
